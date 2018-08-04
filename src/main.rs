@@ -63,7 +63,7 @@ impl App {
     }
 
     fn key(&mut self, args: &ButtonArgs) {
-        let mut release = false;
+        let release;
         match args.state {
             ButtonState::Press => release = false,
             ButtonState::Release => release = true,
