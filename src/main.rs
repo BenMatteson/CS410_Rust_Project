@@ -25,9 +25,10 @@ use opengl_graphics::{
 mod enemy;
 mod entity;
 mod player;
+mod projectile;
 
 use enemy::Enemy;
-use entity::Entity;
+use entity::{Entity, load_asset};
 use player::Player;
 
 pub struct App {
@@ -68,13 +69,20 @@ impl App {
             ButtonState::Press => release = false,
             ButtonState::Release => release = true,
         }
+        // actions to fire only on press
+        if release == false {
+            match args.button {
+                Button::Keyboard(Key::Space) => self.entities.append(&mut self.player.fire()),
+                _ => (),
+            };
+        }
         match args.button {
             Button::Keyboard(key @ Key::W) => self.player.movement(key, release),
             Button::Keyboard(key @ Key::A) => self.player.movement(key, release),
             Button::Keyboard(key @ Key::S) => self.player.movement(key, release),
             Button::Keyboard(key @ Key::D) => self.player.movement(key, release),
             _ => (),
-        };
+        }
     }
 }
 
@@ -84,23 +92,14 @@ fn main() {
     let mut window: PistonWindow = WindowSettings::new("spinning-square", [640, 480])
         .opengl(opengl)
         .exit_on_esc(true)
+        .resizable(false)
         .build()
         .unwrap();
-
-    //fetch assets
-    let assets = find_folder::Search::ParentsThenKids(3, 3)
-        .for_folder("assets")
-        .unwrap();
-    let ship = assets.join("ship.png");
-    let mut settings = GlTextureSettings::new();
-    settings.set_generate_mipmap(false);
-    settings.set_compress(false);
-    let ship = GlTexture::from_path(&ship, &settings).unwrap();
 
     // Create a new game and run it.
     let mut app = App {
         gl: GlGraphics::new(opengl),
-        player: Player::new(ship),
+        player: Player::new(),
         entities: Vec::new(),
         rotation: 0.0,
     };

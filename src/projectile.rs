@@ -1,35 +1,30 @@
-extern crate gfx_device_gl;
-
-use entity::{Entity, Direction};
-use graphics::{Image, Transformed};
-use opengl_graphics::{GlGraphics, Texture};
-use piston::input::RenderArgs;
+use entity::{Entity, Team, Direction, load_asset};
+use opengl_graphics::Texture;
 use piston::input::*;
-use piston_window::{rectangle, DrawState};
+use find_folder;
 
-const SPEED: f64 = 500.0;
-const SIZE: f64 = 0.03;
-const START: (f64, f64) = (0.0, 0.0);
 
-pub struct Enemy {
+pub struct Projectile {
     pos: (f64, f64),
+    targets: Team,
     texture: Texture,
     size: f64,
     movement: Direction,
 }
 
-impl Enemy {
-    pub fn new(texture: Texture, size: f64) -> Enemy {
-        Enemy {
-            pos: (0.0, 0.0),
-            texture,
-            size,
-            movement: Direction::new(),
+impl Projectile {
+    pub fn new(targets: Team, pos: (f64, f64), movement: Direction) -> Projectile {
+        Projectile {
+            pos,
+            targets,
+            texture: load_asset("projectile.png"),
+            size: 0.01,
+            movement,
         }
     }
 }
 
-impl Entity for Enemy {
+impl Entity for Projectile {
     fn pos(&self) -> (f64, f64) {
         (self.pos.0, self.pos.1)
     }

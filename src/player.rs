@@ -1,6 +1,7 @@
 extern crate gfx_device_gl;
 
-use entity::{Entity, Direction};
+use entity::{Entity, Direction, Team, load_asset};
+use projectile::Projectile;
 use graphics::Transformed;
 use opengl_graphics::{GlGraphics, Texture};
 use piston::input::RenderArgs;
@@ -10,6 +11,7 @@ use piston_window::{rectangle, DrawState, Image};
 const SIZE: f64 = 0.03;
 const SPEED: f64 = 500.0;
 const START: (f64, f64) = (0.0, 0.0);
+const SHOT_SPEED: f64 = 1000.0;
 
 pub struct Player {
     pos: (f64, f64),
@@ -19,17 +21,12 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(texture: Texture) -> Player {
+    pub fn new() -> Player {
         Player {
             pos: START,
-            texture,
+            texture: load_asset("ship.png"),
             size: SIZE,
-            movement: Direction {
-                up: 0.0,
-                down: 0.0,
-                left: 0.0,
-                right: 0.0,
-            },
+            movement: Direction::new(),
         }
     }
 
@@ -53,6 +50,12 @@ impl Player {
             },
             _ => (),
         };
+    }
+
+    pub fn fire(&self) -> Vec<Box<Entity>> {
+        let mut direction = Direction::new();
+        direction.up = SHOT_SPEED;
+        vec!(Box::new(Projectile::new(Team::Enemy, self.pos, direction)))
     }
 }
 
