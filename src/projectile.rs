@@ -1,8 +1,6 @@
 use entity::{Entity, Team, Direction, load_asset};
 use opengl_graphics::Texture;
 use piston::input::*;
-use find_folder;
-
 
 pub struct Projectile {
     pos: (f64, f64),

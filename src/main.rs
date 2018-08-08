@@ -4,10 +4,9 @@
 
 #![allow(dead_code)]
 //#![allow(unused_variables)]
-#![allow(unused_imports)]
+//#![allow(unused_imports)]
 
 extern crate find_folder;
-extern crate glutin_window;
 extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
@@ -15,20 +14,15 @@ extern crate piston_window;
 
 use piston::event_loop::*;
 use piston::input::*;
-use piston::window::WindowSettings;
-use piston_window::PistonWindow;
-//use glutin_window::GlutinWindow as Window;
-use opengl_graphics::{
-    GlGraphics, OpenGL, Texture as GlTexture, TextureSettings as GlTextureSettings,
-};
+use piston_window::{PistonWindow, WindowSettings};
+use opengl_graphics::{GlGraphics, OpenGL};
 
 mod enemy;
 mod entity;
 mod player;
 mod projectile;
 
-use enemy::Enemy;
-use entity::{Entity, load_asset};
+use entity::Entity;
 use player::Player;
 
 pub struct App {
@@ -89,7 +83,7 @@ impl App {
 fn main() {
     let opengl = OpenGL::V3_2;
     // Create a pistonwindow.
-    let mut window: PistonWindow = WindowSettings::new("spinning-square", [640, 480])
+    let mut window: PistonWindow = WindowSettings::new("Game", [640, 480])
         .opengl(opengl)
         .exit_on_esc(true)
         .resizable(false)

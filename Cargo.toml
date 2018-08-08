@@ -5,9 +5,7 @@ authors = ["Ben <bwm3@pdx.edu>"]
 
 [dependencies]
 piston = "0.37.0"
+piston_window = "0.80.0"
 piston2d-graphics = "0.26.0"
-pistoncore-glutin_window = "0.47.0"
 piston2d-opengl_graphics = "0.53.0"
 find_folder = "0.3.0"
-piston_window = "0.80.0"
-gfx_device_gl = "0.15.0"

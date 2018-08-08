@@ -1,12 +1,7 @@
-extern crate gfx_device_gl;
-
 use entity::{Entity, Direction, Team, load_asset};
 use projectile::Projectile;
-use graphics::Transformed;
-use opengl_graphics::{GlGraphics, Texture};
-use piston::input::RenderArgs;
+use opengl_graphics::Texture;
 use piston::input::*;
-use piston_window::{rectangle, DrawState, Image};
 
 const SIZE: f64 = 0.03;
 const SPEED: f64 = 500.0;

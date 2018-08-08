@@ -2,12 +2,8 @@ use piston::input::RenderArgs;
 use piston::input::*;
 use piston_window::{rectangle, DrawState, Image};
 use graphics::Transformed;
-use opengl_graphics::{Texture};
+use opengl_graphics::{GlGraphics, Texture, TextureSettings};
 use find_folder;
-use opengl_graphics::{
-    GlGraphics, OpenGL, Texture as GlTexture, TextureSettings as GlTextureSettings,
-};
-
 
 pub trait Entity {
     fn pos(&self) -> (f64, f64);
@@ -34,11 +30,11 @@ pub fn load_asset(asset: &str) -> Texture {
         .unwrap();
     let file = assets.join(asset);
 
-    let mut settings = GlTextureSettings::new();
+    let mut settings = TextureSettings::new();
     settings.set_generate_mipmap(false);
     settings.set_compress(false);
 
-    GlTexture::from_path(&file, &settings).unwrap()
+    Texture::from_path(&file, &settings).unwrap()
 }
 
 pub struct Direction {
