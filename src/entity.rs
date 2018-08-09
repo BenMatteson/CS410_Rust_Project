@@ -10,6 +10,9 @@ pub trait Entity {
     fn texture(&self) -> &Texture;
     fn size(&self) -> f64;
     fn update(&mut self, args: &UpdateArgs);
+    fn alive(&self) -> bool {
+        true
+    }
     fn render(&self, gl: &mut GlGraphics, args: &RenderArgs) {
         let image = Image::new().rect(rectangle::centered(rectangle::square(
             0.0,

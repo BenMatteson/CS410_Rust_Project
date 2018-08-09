@@ -7,12 +7,14 @@ const SIZE: f64 = 0.03;
 const SPEED: f64 = 500.0;
 const START: (f64, f64) = (0.0, 0.0);
 const SHOT_SPEED: f64 = 1000.0;
+const FIRE_RATE: f64 = 0.1;
 
 pub struct Player {
     pos: (f64, f64),
     texture: Texture,
     movement: Direction,
     size: f64,
+    shot_delay: f64,
 }
 
 impl Player {
@@ -22,6 +24,7 @@ impl Player {
             texture: load_asset("ship.png"),
             size: SIZE,
             movement: Direction::new(),
+            shot_delay: 0.0,
         }
     }
 
@@ -47,10 +50,16 @@ impl Player {
         };
     }
 
-    pub fn fire(&self) -> Vec<Box<Entity>> {
-        let mut direction = Direction::new();
-        direction.up = SHOT_SPEED;
-        vec!(Box::new(Projectile::new(Team::Enemy, self.pos, direction)))
+    pub fn fire(&mut self) -> Vec<Box<Entity>> {
+        let mut volley:Vec<Box<Entity>> = Vec::new();
+        if self.shot_delay <= 0.0 {
+            let mut direction = Direction::new();
+            direction.up = SHOT_SPEED;
+            // volley has only single projectile for now
+            volley.push(Box::new(Projectile::new(Team::Enemy, self.pos, direction)));
+            self.shot_delay = FIRE_RATE;
+        }
+        volley
     }
 }
 
@@ -68,6 +77,8 @@ impl Entity for Player {
         let (x, y) = self.pos;
         let x_movement = self.movement.right - self.movement.left;
         let y_movement = self.movement.down - self.movement.up;
-        self.pos = (x + (x_movement * args.dt), y + (y_movement * args.dt))
+        self.pos = (x + (x_movement * args.dt), y + (y_movement * args.dt));
+
+        self.shot_delay -= args.dt;
     }
 }
