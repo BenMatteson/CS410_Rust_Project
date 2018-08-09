@@ -5,7 +5,11 @@ use piston::input::*;
 
 const SIZE: f64 = 0.03;
 const SPEED: f64 = 500.0;
-const START: (f64, f64) = (0.0, 0.0);
+const START: (f64, f64) = (320.0, 420.0);
+const MAX_X: f64 = 620.0;
+const MAX_Y: f64 = 460.0;
+const MIN_X: f64 = 20.0;
+const MIN_Y: f64 = 20.0;
 const SHOT_SPEED: f64 = 1000.0;
 const FIRE_RATE: f64 = 0.1;
 
@@ -78,6 +82,18 @@ impl Entity for Player {
         let x_movement = self.movement.right - self.movement.left;
         let y_movement = self.movement.down - self.movement.up;
         self.pos = (x + (x_movement * args.dt), y + (y_movement * args.dt));
+        if self.pos.0 < MIN_X {
+            self.pos.0 = MIN_X;
+        }
+        if self.pos.0 > MAX_X {
+            self.pos.0 = MAX_X;
+        }
+        if self.pos.1 < MIN_Y {
+            self.pos.1 = MIN_Y;
+        }
+        if self.pos.1 > MAX_Y {
+            self.pos.1 = MAX_Y;
+        }
 
         self.shot_delay -= args.dt;
     }

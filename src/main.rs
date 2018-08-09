@@ -28,6 +28,8 @@ mod projectile;
 use entity::Entity;
 use player::Player;
 
+// TODO edge detection
+
 pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
     player: Player,

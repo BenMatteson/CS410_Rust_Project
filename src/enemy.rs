@@ -14,12 +14,14 @@ pub struct Enemy {
 }
 
 impl Enemy {
-    pub fn new(texture: Texture, size: f64) -> Enemy {
+    pub fn new(texture: Texture, size: f64, pos: (f64, f64)) -> Enemy {
+        let mut drift_down = Direction::new();
+        drift_down.down = 50.0;
         Enemy {
-            pos: (0.0, 0.0),
+            pos,
             texture,
             size,
-            movement: Direction::new(),
+            movement: drift_down,
         }
     }
 }
