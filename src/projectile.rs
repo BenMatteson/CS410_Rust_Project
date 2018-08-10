@@ -1,4 +1,4 @@
-use entity::{Entity, Team, Direction, load_asset};
+use entity::*;
 use opengl_graphics::Texture;
 use piston::input::*;
 
@@ -7,6 +7,7 @@ const LOW_BOUND: f64 = -10.0;
 const HIGH_BOUND: f64 = 490.0;
 
 pub struct Projectile {
+    //    id: usize,
     pos: (f64, f64),
     targets: Team,
     texture: Texture,
@@ -16,12 +17,13 @@ pub struct Projectile {
 }
 
 impl Projectile {
-    pub fn new(targets: Team, pos: (f64, f64), movement: Direction) -> Projectile {
+    pub fn new(targets: Team, pos: (f64, f64), movement: Direction, size: f64) -> Projectile {
         Projectile {
+            //            id: rand_id(),
             pos,
             targets,
             texture: load_asset("projectile.png"),
-            size: 0.01,
+            size,
             movement,
             alive: true,
         }
@@ -29,6 +31,9 @@ impl Projectile {
 }
 
 impl Entity for Projectile {
+    //    fn id(&self) -> usize {
+    //        self.id
+    //    }
     fn pos(&self) -> (f64, f64) {
         (self.pos.0, self.pos.1)
     }
@@ -37,9 +42,6 @@ impl Entity for Projectile {
     }
     fn size(&self) -> f64 {
         self.size
-    }
-    fn alive(&self) -> bool {
-        self.alive
     }
     fn update(&mut self, args: &UpdateArgs) {
         let (x, y) = self.pos;
@@ -50,5 +52,8 @@ impl Entity for Projectile {
         if self.pos.1 < LOW_BOUND || self.pos.1 > HIGH_BOUND {
             self.alive = false;
         }
+    }
+    fn alive(&self) -> bool {
+        self.alive
     }
 }

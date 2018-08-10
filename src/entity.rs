@@ -1,15 +1,18 @@
+use find_folder;
+use graphics::Transformed;
+use opengl_graphics::{GlGraphics, Texture, TextureSettings};
 use piston::input::RenderArgs;
 use piston::input::*;
 use piston_window::{rectangle, DrawState, Image};
-use graphics::Transformed;
-use opengl_graphics::{GlGraphics, Texture, TextureSettings};
-use find_folder;
+//use rand::{thread_rng, Rng};
 
 pub trait Entity {
+    //    fn id(&self) -> usize;
     fn pos(&self) -> (f64, f64);
     fn texture(&self) -> &Texture;
     fn size(&self) -> f64;
     fn update(&mut self, args: &UpdateArgs);
+    fn collide(&mut self, other: &Entity) {}
     fn alive(&self) -> bool {
         true
     }
@@ -17,7 +20,8 @@ pub trait Entity {
         let image = Image::new().rect(rectangle::centered(rectangle::square(
             0.0,
             0.0,
-            args.draw_width as f64 * self.size(),
+            //args.draw_width as f64 * self.size(),
+            self.size(),
         )));
         let (x, y) = self.pos();
         gl.draw(args.viewport(), |c, gl| {
@@ -26,6 +30,18 @@ pub trait Entity {
         });
     }
 }
+
+//impl PartialEq for Entity {
+//    fn eq(&self, other: &Entity) -> bool {
+//        self.id() == other.id()
+//    }
+//}
+
+// generates random number to be used as id, no checking, not ideal
+//pub fn rand_id() -> usize {
+//    let mut rng = thread_rng();
+//    rng.gen_range(usize::min_value(), usize::max_value())
+//}
 
 pub fn load_asset(asset: &str) -> Texture {
     let assets = find_folder::Search::ParentsThenKids(3, 3)
@@ -58,8 +74,8 @@ impl Direction {
     }
 }
 
-pub trait Player{}
-pub trait Enemy{}
+pub trait Player {}
+pub trait Enemy {}
 
 pub enum Team {
     Player,

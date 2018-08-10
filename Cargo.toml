@@ -9,6 +9,7 @@ piston_window = "0.80.0"
 piston2d-graphics = "0.26.0"
 piston2d-opengl_graphics = "0.53.0"
 find_folder = "0.3.0"
+rand = "0.5.5"
 
 [dependencies.odds]
 version = "0.3.1"

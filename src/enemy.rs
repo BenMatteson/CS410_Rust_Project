@@ -1,4 +1,4 @@
-use entity::{Entity, Direction};
+use entity::*;
 use opengl_graphics::Texture;
 use piston::input::*;
 
@@ -7,6 +7,7 @@ const SIZE: f64 = 0.03;
 const START: (f64, f64) = (0.0, 0.0);
 
 pub struct Enemy {
+    //    id: usize,
     pos: (f64, f64),
     texture: Texture,
     size: f64,
@@ -18,6 +19,7 @@ impl Enemy {
         let mut drift_down = Direction::new();
         drift_down.down = 50.0;
         Enemy {
+            //            id: rand_id(),
             pos,
             texture,
             size,
@@ -27,6 +29,9 @@ impl Enemy {
 }
 
 impl Entity for Enemy {
+    //    fn id(&self) -> usize {
+    //        self.id
+    //    }
     fn pos(&self) -> (f64, f64) {
         (self.pos.0, self.pos.1)
     }
