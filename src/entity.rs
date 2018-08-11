@@ -6,13 +6,23 @@ use piston::input::*;
 use piston_window::{rectangle, DrawState, Image};
 //use rand::{thread_rng, Rng};
 
+const BASE_COLLISION_DAMAGE: i64 = 5;
+
 pub trait Entity {
     //    fn id(&self) -> usize;
     fn pos(&self) -> (f64, f64);
     fn texture(&self) -> &Texture;
     fn size(&self) -> f64;
     fn update(&mut self, args: &UpdateArgs);
-    fn collide(&mut self, other: &Entity) {}
+    fn collide(&mut self, other: &mut Entity) {
+        if self.team() != other.team() {
+            other.damage(BASE_COLLISION_DAMAGE);
+        }
+    }
+    #[allow(unused_variables)]
+    fn damage(&mut self, amount: i64) -> bool {
+        false
+    }
     fn alive(&self) -> bool {
         true
     }
@@ -75,12 +85,9 @@ impl Direction {
     }
 }
 
-pub trait Player {}
-pub trait Enemy {}
-
 #[derive(PartialEq, Eq)]
 pub enum Team {
     Player,
     Enemy,
-    Projectile,
+    Immune,
 }

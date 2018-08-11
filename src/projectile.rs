@@ -14,7 +14,7 @@ pub struct Projectile {
     size: f64,
     movement: Direction,
     alive: bool,
-    damage: u64,
+    damage: i64,
 }
 
 impl Projectile {
@@ -22,7 +22,7 @@ impl Projectile {
         pos: (f64, f64),
         movement: Direction,
         targets: Team,
-        damage: u64,
+        damage: i64,
         size: f64,
     ) -> Projectile {
         Projectile {
@@ -35,10 +35,6 @@ impl Projectile {
             alive: true,
             damage,
         }
-    }
-
-    pub fn damage(&self) -> u64 {
-        return self.damage;
     }
 }
 
@@ -65,16 +61,18 @@ impl Entity for Projectile {
             self.alive = false;
         }
     }
-    fn collide(&mut self, other: &Entity) {
+    fn collide(&mut self, other: &mut Entity) {
         if other.team() == self.targets {
-            // we have a hit!
-            self.alive = false;
+            if other.damage(self.damage) {
+                self.alive = false;
+
+            }
         }
     }
     fn alive(&self) -> bool {
         self.alive
     }
     fn team(&self) -> Team {
-        Team::Projectile
+        Team::Immune
     }
 }

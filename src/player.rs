@@ -3,15 +3,19 @@ use opengl_graphics::Texture;
 use piston::input::*;
 use projectile::Projectile;
 
-const SIZE: f64 = 20.0;
+const SHOT_SPEED: f64 = 1000.0; // pixels/sec
+const FIRE_RATE: f64 = 0.1; // sec/shot
+const IFRAMES: usize = 30; // 120 ticks/sec
+const BASE_HEALTH: i64 = 100;
+
+const SIZE: f64 = 20.0; // pixels (radius?)
 const SPEED: f64 = 500.0;
 const START: (f64, f64) = (320.0, 420.0);
+
 const MAX_X: f64 = 620.0;
 const MAX_Y: f64 = 460.0;
 const MIN_X: f64 = 20.0;
 const MIN_Y: f64 = 20.0;
-const SHOT_SPEED: f64 = 1000.0;
-const FIRE_RATE: f64 = 0.1;
 
 pub struct Player {
     //    id: usize,
@@ -20,6 +24,8 @@ pub struct Player {
     movement: Direction,
     size: f64,
     shot_delay: f64,
+    iframes: usize,
+    health: i64,
 }
 
 impl Player {
@@ -31,6 +37,8 @@ impl Player {
             size: SIZE,
             movement: Direction::new(),
             shot_delay: 0.0,
+            iframes: 0,
+            health: BASE_HEALTH,
         }
     }
 
@@ -107,6 +115,15 @@ impl Entity for Player {
         }
 
         self.shot_delay -= args.dt;
+        self.iframes = self.iframes.saturating_sub(1);
+    }
+    fn damage(&mut self, amount: i64) -> bool {
+        if self.iframes == 0 {
+            self.health -= amount;
+            self.iframes = IFRAMES;
+            true
+        }
+        else { false }
     }
     fn team(&self) -> Team {
         Team::Player

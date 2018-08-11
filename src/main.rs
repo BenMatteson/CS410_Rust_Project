@@ -25,11 +25,11 @@ mod entity;
 mod player;
 mod projectile;
 
-use entity::Entity;
+use entity::*;
 use player::Player;
 
 // TODO edge detection
-// player is bounded, projectiles bounded on y
+// player is bounded, projectiles and enemies bounded on y
 // for now assuming fixed sized window...
 
 pub struct App {
@@ -53,15 +53,17 @@ impl App {
             entity.render(&mut self.gl, args);
         }
         self.player.render(&mut self.gl, args);
+
+        // TODO player health, score, other UI?
     }
 
     fn update(&mut self, args: &UpdateArgs) {
         // Rotate 2 radians per second.
         self.player.update(args);
-        if self.fire_key_down {
+        if self.fire_key_down { // player manages cooldown, passes any new projectiles (entities)
             self.entities.append(&mut self.player.fire());
         }
-        {
+        { // collisions
             let mut collisions = Vec::new();
             let mut player_collisions = Vec::new();
             // compare each element to find collisions, can skip preceding since they were already compared
@@ -91,6 +93,8 @@ impl App {
                 collide(&mut self.player, entity);
             }
         }
+
+        //TODO spawn enemies
 
         self.entities.retain_mut(|entity| {
             entity.update(args);
@@ -131,6 +135,41 @@ fn check_collision(entity1: &Entity, entity2: &Entity) -> bool {
     dist < entity1.size() + entity2.size()
 }
 
+#[test]
+fn test_check_collision() {
+    struct CollisionTestEntity {
+        pos: (f64, f64),
+        size: f64,
+    }
+    impl Entity for CollisionTestEntity {
+        fn pos(&self) -> (f64, f64) {
+            self.pos
+        }
+
+        fn texture(&self) -> &opengl_graphics::Texture {
+            unimplemented!()
+        }
+
+        fn size(&self) -> f64 {
+            self.size
+        }
+
+        fn update(&mut self, args: &UpdateArgs) {
+            unimplemented!()
+        }
+
+        fn team(&self) -> Team {
+            unimplemented!()
+        }
+    }
+    let entity1 = &CollisionTestEntity{ pos: (0.0, 0.0), size: 5.0};
+    let entity2 = &CollisionTestEntity{ pos: (0.0, 10.0), size: 5.0};
+    let entity3 = &CollisionTestEntity{ pos: (10.0, 0.0), size: 5.001};
+    assert_eq!(check_collision(entity1, entity2), false);
+    assert_eq!(check_collision(entity1, entity3), true);
+    assert_eq!(check_collision(entity2, entity3), false);
+}
+
 fn main() {
     let opengl = OpenGL::V3_2;
     // Create a pistonwindow.
@@ -149,6 +188,7 @@ fn main() {
         fire_key_down: false,
     };
 
+    // core game loop, default ticks/sec = 120
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
         if let Some(r) = e.render_args() {
