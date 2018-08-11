@@ -47,4 +47,7 @@ impl Entity for Enemy {
         let y_movement = self.movement.down - self.movement.up;
         self.pos = (x + (x_movement * args.dt), y + (y_movement * args.dt))
     }
+    fn team(&self) -> Team {
+        Team::Enemy
+    }
 }

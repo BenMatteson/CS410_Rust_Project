@@ -65,7 +65,7 @@ impl Player {
             volley.push(Box::new(Projectile::new(
                 self.pos,
                 direction,
-                Team::Enemy, 
+                Team::Enemy,
                 10,
                 SIZE / 3.0,
             )));
@@ -107,5 +107,8 @@ impl Entity for Player {
         }
 
         self.shot_delay -= args.dt;
+    }
+    fn team(&self) -> Team {
+        Team::Player
     }
 }

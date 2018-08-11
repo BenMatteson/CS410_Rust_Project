@@ -16,6 +16,7 @@ pub trait Entity {
     fn alive(&self) -> bool {
         true
     }
+    fn team(&self) -> Team;
     fn render(&self, gl: &mut GlGraphics, args: &RenderArgs) {
         let image = Image::new().rect(rectangle::centered(rectangle::square(
             0.0,
@@ -81,4 +82,5 @@ pub trait Enemy {}
 pub enum Team {
     Player,
     Enemy,
+    Projectile,
 }

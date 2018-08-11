@@ -18,7 +18,13 @@ pub struct Projectile {
 }
 
 impl Projectile {
-    pub fn new(pos: (f64, f64), movement: Direction, targets: Team, damage: u64, size: f64) -> Projectile {
+    pub fn new(
+        pos: (f64, f64),
+        movement: Direction,
+        targets: Team,
+        damage: u64,
+        size: f64,
+    ) -> Projectile {
         Projectile {
             //            id: rand_id(),
             pos,
@@ -31,7 +37,7 @@ impl Projectile {
         }
     }
 
-    pub fn damage() -> u64 {
+    pub fn damage(&self) -> u64 {
         return self.damage;
     }
 }
@@ -49,14 +55,6 @@ impl Entity for Projectile {
     fn size(&self) -> f64 {
         self.size
     }
-    fn collide(&mut self, other: &Entity) {
-        // fixme should have entities track their own team
-        let hit = match other {
-            Player => self.targets == Team::Player,
-            Enemy => self.targets == Team::Enemy,
-        };
-        self.alive = !hit;
-    }
     fn update(&mut self, args: &UpdateArgs) {
         let (x, y) = self.pos;
         let x_movement = self.movement.right - self.movement.left;
@@ -67,7 +65,16 @@ impl Entity for Projectile {
             self.alive = false;
         }
     }
+    fn collide(&mut self, other: &Entity) {
+        if other.team() == self.targets {
+            // we have a hit!
+            self.alive = false;
+        }
+    }
     fn alive(&self) -> bool {
         self.alive
+    }
+    fn team(&self) -> Team {
+        Team::Projectile
     }
 }
