@@ -77,6 +77,7 @@ impl Direction {
 pub trait Player {}
 pub trait Enemy {}
 
+#[derive(PartialEq, Eq)]
 pub enum Team {
     Player,
     Enemy,

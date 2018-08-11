@@ -29,6 +29,8 @@ use entity::Entity;
 use player::Player;
 
 // TODO edge detection
+// player is bounded, projectiles bounded on y
+// for now assuming fixed sized window...
 
 pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
@@ -59,34 +61,37 @@ impl App {
         if self.fire_key_down {
             self.entities.append(&mut self.player.fire());
         }
-        let mut collisions = Vec::new();
         {
+            let mut collisions = Vec::new();
+            let mut player_collisions = Vec::new();
+            // compare each element to find collisions, can skip preceding since they were already compared
             for entity in self.entities.iter().enumerate() {
-                let (x1, y1) = entity.1.pos();
-                let entity_size = entity.1.size();
-                let entity_index = entity.0;
                 // compare to remaining items on the list, skip elements up to and including self (index + 1)
-                for other in self.entities.iter().enumerate().skip(entity_index + 1) {
-                    // calculate collision
-                    let (x2, y2) = other.1.pos();
-                    let dx = x1 - x2;
-                    let dy = y1 - y2;
-                    let dist = { (dx * dx) + (dy * dy) }.sqrt();
-                    if dist < entity_size + other.1.size() {
+                for other in self.entities.iter().enumerate().skip(entity.0 + 1) {
+                    if check_collision(entity.1.as_ref(), other.1.as_ref()) {
                         // store collisions as pairs of indexes
-                        collisions.push((entity_index, other.0))
+                        collisions.push((entity.0, other.0))
                     }
                 }
+                // also check for collisions with the player
+                if check_collision(&self.player, entity.1.as_ref()) {
+                    player_collisions.push(entity.0);
+                }
             }
-
-            for (thing1, thing2) in collisions {
-                let (thing1_side, thing2_side) = self.entities.split_at_mut(thing2);
-                let thing1 = thing1_side[thing1].as_mut();
-                let thing2 = thing2_side[0].as_mut();
-                thing1.collide(thing2);
-                thing2.collide(thing1);
+            for (entity1_index, entity2_index) in collisions {
+                // split the vec to be able to mutate both elements, split after element1 so it keeps index
+                // element2 becomes the first element of the second slice.
+                let (entity1_slice, entity2_slice) = self.entities.split_at_mut(entity2_index);
+                let thing1 = entity1_slice[entity1_index].as_mut();
+                let thing2 = entity2_slice[0].as_mut();
+                collide(thing1, thing2);
+            }
+            for entity_index in player_collisions {
+                let entity = self.entities[entity_index].as_mut();
+                collide(&mut self.player, entity);
             }
         }
+
         self.entities.retain_mut(|entity| {
             entity.update(args);
             entity.alive()
@@ -109,6 +114,21 @@ impl App {
             _ => (),
         }
     }
+}
+
+fn collide(entity1: &mut Entity, entity2: &mut Entity) {
+    //eprintln!("collision");
+    entity1.collide(entity2);
+    entity2.collide(entity1);
+}
+
+fn check_collision(entity1: &Entity, entity2: &Entity) -> bool {
+    let (x1, y1) = entity1.pos();
+    let (x2, y2) = entity2.pos();
+    let dx = x1 - x2;
+    let dy = y1 - y2;
+    let dist = { (dx * dx) + (dy * dy) }.sqrt();
+    dist < entity1.size() + entity2.size()
 }
 
 fn main() {

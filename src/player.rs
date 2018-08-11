@@ -63,9 +63,10 @@ impl Player {
             direction.up = SHOT_SPEED;
             // volley has only single projectile for now
             volley.push(Box::new(Projectile::new(
-                Team::Enemy,
                 self.pos,
                 direction,
+                Team::Enemy, 
+                10,
                 SIZE / 3.0,
             )));
             self.shot_delay = FIRE_RATE;
