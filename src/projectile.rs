@@ -12,7 +12,7 @@ pub struct Projectile {
     targets: Team,
     texture: Texture,
     size: f64,
-    movement: Direction,
+    movement: Movement,
     alive: bool,
     damage: i64,
 }
@@ -20,7 +20,7 @@ pub struct Projectile {
 impl Projectile {
     pub fn new(
         pos: (f64, f64),
-        movement: Direction,
+        movement: Movement,
         targets: Team,
         damage: i64,
         size: f64,

@@ -67,21 +67,30 @@ pub fn load_asset(asset: &str) -> Texture {
     Texture::from_path(&file, &settings).unwrap()
 }
 
-pub struct Direction {
+pub struct Movement {
     pub up: f64,
     pub down: f64,
     pub left: f64,
     pub right: f64,
 }
 
-impl Direction {
-    pub fn new() -> Direction {
-        Direction {
+impl Movement {
+    pub fn new() -> Movement {
+        Movement {
             up: 0.0,
             down: 0.0,
             left: 0.0,
             right: 0.0,
         }
+    }
+
+    pub fn applied_to(&self, pos: (f64, f64), delta_time: f64) -> (f64, f64) {
+        let (mut x, mut y) = pos;
+        let x_movement = (self.right - self.left) * delta_time;
+        let y_movement = (self.down - self.up) * delta_time;
+        x += x_movement;
+        y += y_movement;
+        (x, y)
     }
 }
 

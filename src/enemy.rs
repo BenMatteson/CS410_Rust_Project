@@ -12,13 +12,13 @@ pub struct Enemy {
     pos: (f64, f64),
     texture: Texture,
     size: f64,
-    movement: Direction,
+    movement: Movement,
     alive: bool,
 }
 
 impl Enemy {
     pub fn new(texture: Texture, size: f64, pos: (f64, f64)) -> Enemy {
-        let mut drift_down = Direction::new();
+        let mut drift_down = Movement::new();
         drift_down.down = SPEED;
         Enemy {
             //            id: rand_id(),
@@ -45,10 +45,7 @@ impl Entity for Enemy {
         self.size
     }
     fn update(&mut self, args: &UpdateArgs) {
-        let (x, y) = self.pos;
-        let x_movement = self.movement.right - self.movement.left;
-        let y_movement = self.movement.down - self.movement.up;
-        self.pos = (x + (x_movement * args.dt), y + (y_movement * args.dt));
+        self.pos = self.movement.applied_to(self.pos, args.dt);
 
         if self.pos.1 < LOW_BOUND || self.pos.1 > HIGH_BOUND {
             self.alive = false;

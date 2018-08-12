@@ -2,6 +2,7 @@ use entity::*;
 use opengl_graphics::Texture;
 use piston::input::*;
 use projectile::Projectile;
+use opengl_graphics::GlGraphics;
 
 const SHOT_SPEED: f64 = 1000.0; // pixels/sec
 const FIRE_RATE: f64 = 0.1; // sec/shot
@@ -21,7 +22,7 @@ pub struct Player {
     //    id: usize,
     pos: (f64, f64),
     texture: Texture,
-    movement: Direction,
+    movement: Movement,
     size: f64,
     shot_delay: f64,
     iframes: usize,
@@ -35,7 +36,7 @@ impl Player {
             pos: START,
             texture: load_asset("ship.png"),
             size: SIZE,
-            movement: Direction::new(),
+            movement: Movement::new(),
             shot_delay: 0.0,
             iframes: 0,
             health: BASE_HEALTH,
@@ -67,7 +68,7 @@ impl Player {
     pub fn fire(&mut self) -> Vec<Box<Entity>> {
         let mut volley: Vec<Box<Entity>> = Vec::new();
         if self.shot_delay <= 0.0 {
-            let mut direction = Direction::new();
+            let mut direction = Movement::new();
             direction.up = SHOT_SPEED;
             // volley has only single projectile for now
             volley.push(Box::new(Projectile::new(
@@ -97,22 +98,20 @@ impl Entity for Player {
         self.size
     }
     fn update(&mut self, args: &UpdateArgs) {
-        let (x, y) = self.pos;
-        let x_movement = self.movement.right - self.movement.left;
-        let y_movement = self.movement.down - self.movement.up;
-        self.pos = (x + (x_movement * args.dt), y + (y_movement * args.dt));
-        if self.pos.0 < MIN_X {
-            self.pos.0 = MIN_X;
+        let (mut x, mut y) = self.movement.applied_to(self.pos, args.dt);
+        if x < MIN_X {
+            x = MIN_X;
         }
-        if self.pos.0 > MAX_X {
-            self.pos.0 = MAX_X;
+        if x > MAX_X {
+            x = MAX_X;
         }
-        if self.pos.1 < MIN_Y {
-            self.pos.1 = MIN_Y;
+        if y < MIN_Y {
+            y = MIN_Y;
         }
-        if self.pos.1 > MAX_Y {
-            self.pos.1 = MAX_Y;
+        if y > MAX_Y {
+            y = MAX_Y;
         }
+        self.pos = (x, y);
 
         self.shot_delay -= args.dt;
         self.iframes = self.iframes.saturating_sub(1);
