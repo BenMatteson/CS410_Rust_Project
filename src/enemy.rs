@@ -2,7 +2,7 @@ use entity::*;
 use opengl_graphics::Texture;
 use piston::input::*;
 
-const SPEED: f64 = 50.0;
+const SPEED: f64 = 80.0;
 
 const LOW_BOUND: f64 = -20.0;
 const HIGH_BOUND: f64 = 500.0;
@@ -14,10 +14,11 @@ pub struct Enemy {
     size: f64,
     movement: Movement,
     alive: bool,
+    hp: i64
 }
 
 impl Enemy {
-    pub fn new(size: f64, pos: (f64, f64)) -> Enemy {
+    pub fn new(size: f64, pos: (f64, f64), hp: i64) -> Enemy {
         let mut drift_down = Movement::new();
         drift_down.down = SPEED;
         Enemy {
@@ -27,6 +28,7 @@ impl Enemy {
             size,
             movement: drift_down,
             alive: true,
+            hp,
         }
     }
 }
@@ -55,7 +57,19 @@ impl Entity for Enemy {
         // TODO fight back! enemies should shoot too
     }
 
+    fn damage(&mut self, amount: i64) -> bool {
+        //println!("enemy damaged, {} -> {}", self.hp, self.hp - amount);
+        self.hp -= amount;
+        if self.hp <= 0 {
+            self.alive = false;
+            //println!("enemy died");
+        }
+        true
+    }
 
+    fn alive(&self) -> bool {
+        self.alive
+    }
 
     fn team(&self) -> Team {
         Team::Enemy

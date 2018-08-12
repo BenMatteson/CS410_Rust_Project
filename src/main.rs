@@ -30,10 +30,6 @@ use entity::*;
 use player::Player;
 use enemy::Enemy;
 
-// TODO edge detection
-// player is bounded, projectiles and enemies bounded on y
-// for now assuming fixed sized window...
-
 pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
     player: Player,
@@ -100,7 +96,7 @@ impl App {
         if self.spawn_timer == 0 {
             let mut rng = thread_rng();
             let x_pos = rng.gen_range(20_f64, 620_f64);
-            let new_enemy = Enemy::new(20.0, (x_pos, -10.0));
+            let new_enemy = Enemy::new(20.0, (x_pos, -10.0), 30);
             self.entities.push(Box::new(new_enemy));
             self.spawn_timer = rng.gen_range(60, 240);
         } else {
