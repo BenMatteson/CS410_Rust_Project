@@ -13,7 +13,10 @@ pub trait Entity {
     fn pos(&self) -> (f64, f64);
     fn texture(&self) -> &Texture;
     fn size(&self) -> f64;
-    fn update(&mut self, args: &UpdateArgs);
+    #[allow(unused_variables)]
+    fn update(&mut self, args: &UpdateArgs) -> Option<Vec<Box<Entity>>> {
+        None
+    }
     fn collide(&mut self, other: &mut Entity) {
         if self.team() != other.team() {
             other.damage(BASE_COLLISION_DAMAGE);

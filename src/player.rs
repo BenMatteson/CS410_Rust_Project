@@ -26,6 +26,7 @@ pub struct Player {
     shot_delay: f64,
     iframes: usize,
     health: i64,
+    fire_key_down: bool,
 }
 
 impl Player {
@@ -39,6 +40,7 @@ impl Player {
             shot_delay: 0.0,
             iframes: 0,
             health: BASE_HEALTH,
+            fire_key_down: false,
         }
     }
 
@@ -64,7 +66,11 @@ impl Player {
         };
     }
 
-    pub fn fire(&mut self) -> Vec<Box<Entity>> {
+    pub fn set_firing(&mut self, fire: bool) {
+        self.fire_key_down = fire;
+    }
+
+    fn fire(&mut self) -> Vec<Box<Entity>> {
         let mut volley: Vec<Box<Entity>> = Vec::new();
         if self.shot_delay <= 0.0 {
             let mut direction = Movement::new();
@@ -76,6 +82,7 @@ impl Player {
                 Team::Enemy,
                 10,
                 SIZE / 3.0,
+                load_asset("projectile.png"),
             )));
             self.shot_delay = FIRE_RATE;
         }
@@ -96,7 +103,7 @@ impl Entity for Player {
     fn size(&self) -> f64 {
         self.size
     }
-    fn update(&mut self, args: &UpdateArgs) {
+    fn update(&mut self, args: &UpdateArgs) -> Option<Vec<Box<Entity>>> {
         let (mut x, mut y) = self.movement.applied_to(self.pos, args.dt);
         if x < MIN_X {
             x = MIN_X;
@@ -114,6 +121,11 @@ impl Entity for Player {
 
         self.shot_delay -= args.dt;
         self.iframes = self.iframes.saturating_sub(1);
+
+        match self.fire_key_down {
+            true => Some(self.fire()),
+            false => None,
+        }
     }
     fn damage(&mut self, amount: i64) -> bool {
         if self.iframes == 0 {

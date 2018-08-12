@@ -34,7 +34,6 @@ pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
     player: Player,
     entities: Vec<Box<Entity>>,
-    fire_key_down: bool,
     spawn_timer: usize,
 }
 
@@ -43,11 +42,9 @@ impl App {
         use graphics::*;
 
         const GREEN: [f32; 4] = [0.0, 0.4, 0.25, 1.0];
+        // Clear the screen.
+        clear(GREEN, &mut self.gl);
 
-        self.gl.draw(args.viewport(), |_c, gl| {
-            // Clear the screen.
-            clear(GREEN, gl);
-        });
         for entity in self.entities.iter_mut() {
             entity.render(&mut self.gl, args);
         }
@@ -58,9 +55,9 @@ impl App {
 
     fn update(&mut self, args: &UpdateArgs) {
         // Rotate 2 radians per second.
-        self.player.update(args);
-        if self.fire_key_down { // player manages cooldown, passes any new projectiles (entities)
-            self.entities.append(&mut self.player.fire());
+        match self.player.update(args) {
+            Some(mut shots) => self.entities.append(&mut shots),
+            None => {},
         }
         { // collisions
             let mut collisions = Vec::new();
@@ -103,10 +100,15 @@ impl App {
             self.spawn_timer -= 1;
         }
 
+        let mut new_entities = Vec::new();
         self.entities.retain_mut(|entity| {
-            entity.update(args);
+            match entity.update(args) {
+                Some(mut shots) => new_entities.append(&mut shots),
+                None => {},
+            }
             entity.alive()
-        })
+        });
+        self.entities.append(&mut new_entities);
     }
 
     fn key(&mut self, args: &ButtonArgs) {
@@ -121,7 +123,7 @@ impl App {
             Button::Keyboard(key @ Key::A) => self.player.movement(key, release),
             Button::Keyboard(key @ Key::S) => self.player.movement(key, release),
             Button::Keyboard(key @ Key::D) => self.player.movement(key, release),
-            Button::Keyboard(Key::Space) => self.fire_key_down = !release,
+            Button::Keyboard(Key::Space)   => self.player.set_firing(!release),
             _ => (),
         }
     }
@@ -161,10 +163,6 @@ fn test_check_collision() {
             self.size
         }
 
-        fn update(&mut self, args: &UpdateArgs) {
-            unimplemented!()
-        }
-
         fn team(&self) -> Team {
             unimplemented!()
         }
@@ -192,7 +190,6 @@ fn main() {
         gl: GlGraphics::new(opengl),
         player: Player::new(),
         entities: Vec::new(),
-        fire_key_down: false,
         spawn_timer: 0,
     };
 

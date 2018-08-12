@@ -24,12 +24,13 @@ impl Projectile {
         targets: Team,
         damage: i64,
         size: f64,
+        texture: Texture,
     ) -> Projectile {
         Projectile {
             //            id: rand_id(),
             pos,
             targets,
-            texture: load_asset("projectile.png"),
+            texture,
             size,
             movement,
             alive: true,
@@ -51,7 +52,7 @@ impl Entity for Projectile {
     fn size(&self) -> f64 {
         self.size
     }
-    fn update(&mut self, args: &UpdateArgs) {
+    fn update(&mut self, args: &UpdateArgs) -> Option<Vec<Box<Entity>>> {
         let (x, y) = self.pos;
         let x_movement = self.movement.right - self.movement.left;
         let y_movement = self.movement.down - self.movement.up;
@@ -60,6 +61,7 @@ impl Entity for Projectile {
         if self.pos.1 < LOW_BOUND || self.pos.1 > HIGH_BOUND {
             self.alive = false;
         }
+        None
     }
     fn collide(&mut self, other: &mut Entity) {
         if other.team() == self.targets {
