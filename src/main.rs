@@ -2,7 +2,7 @@
 // https://github.com/PistonDevelopers/Piston-Tutorials/tree/master/getting-started
 // https://github.com/PistonDevelopers/piston-examples
 
-#![allow(dead_code)]
+//#![allow(dead_code)]
 //#![allow(unused_variables)]
 //#![allow(unused_imports)]
 
@@ -13,6 +13,8 @@ extern crate opengl_graphics;
 extern crate piston;
 extern crate piston_window;
 extern crate rand;
+#[macro_use]
+extern crate lazy_static;
 
 use odds::vec::VecExt;
 use opengl_graphics::{GlGraphics, OpenGL};

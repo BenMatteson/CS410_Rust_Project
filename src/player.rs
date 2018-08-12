@@ -1,5 +1,5 @@
 use entity::*;
-use opengl_graphics::Texture;
+use opengl_graphics::{Texture, TextureSettings};
 use piston::input::*;
 use projectile::Projectile;
 
@@ -16,6 +16,10 @@ const MAX_X: f64 = 620.0;
 const MAX_Y: f64 = 460.0;
 const MIN_X: f64 = 20.0;
 const MIN_Y: f64 = 20.0;
+
+lazy_static! {
+    static ref EMPTY: Texture = Texture::empty(&TextureSettings::new()).unwrap();
+}
 
 pub struct Player {
     //    id: usize,
@@ -98,7 +102,10 @@ impl Entity for Player {
         (self.pos.0, self.pos.1)
     }
     fn texture(&self) -> &Texture {
-        &self.texture
+        match self.iframes % 12 {
+            1...6 => &EMPTY,
+            _ => &self.texture,
+        }
     }
     fn size(&self) -> f64 {
         self.size
@@ -131,9 +138,9 @@ impl Entity for Player {
         if self.iframes == 0 {
             self.health -= amount;
             self.iframes = IFRAMES;
-            true
+            
         }
-        else { false }
+        true
     }
     fn team(&self) -> Team {
         Team::Player

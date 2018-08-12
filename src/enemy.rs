@@ -65,7 +65,7 @@ impl Entity for Enemy {
 
         if self.shot_timer == 0 {
             let mut rng = thread_rng();
-            self.shot_timer = rng.gen_range(60, 120);
+            self.shot_timer = rng.gen_range(90, 240);
             let mut shot: Vec<Box<Entity>> = Vec::new();
             let mut shot_movement = Movement::new();
             shot_movement.down = SHOT_SPEED;
