@@ -17,13 +17,13 @@ pub struct Enemy {
 }
 
 impl Enemy {
-    pub fn new(texture: Texture, size: f64, pos: (f64, f64)) -> Enemy {
+    pub fn new(size: f64, pos: (f64, f64)) -> Enemy {
         let mut drift_down = Movement::new();
         drift_down.down = SPEED;
         Enemy {
             //            id: rand_id(),
             pos,
-            texture,
+            texture: load_asset("enemy.png"),
             size,
             movement: drift_down,
             alive: true,

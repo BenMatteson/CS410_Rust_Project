@@ -2,7 +2,6 @@ use entity::*;
 use opengl_graphics::Texture;
 use piston::input::*;
 use projectile::Projectile;
-use opengl_graphics::GlGraphics;
 
 const SHOT_SPEED: f64 = 1000.0; // pixels/sec
 const FIRE_RATE: f64 = 0.1; // sec/shot

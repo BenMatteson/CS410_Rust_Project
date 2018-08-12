@@ -19,6 +19,7 @@ use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::*;
 use piston::input::*;
 use piston_window::{PistonWindow, WindowSettings};
+use rand::{thread_rng, Rng};
 
 mod enemy;
 mod entity;
@@ -27,6 +28,7 @@ mod projectile;
 
 use entity::*;
 use player::Player;
+use enemy::Enemy;
 
 // TODO edge detection
 // player is bounded, projectiles and enemies bounded on y
@@ -37,6 +39,7 @@ pub struct App {
     player: Player,
     entities: Vec<Box<Entity>>,
     fire_key_down: bool,
+    spawn_timer: usize,
 }
 
 impl App {
@@ -94,7 +97,15 @@ impl App {
             }
         }
 
-        //TODO spawn enemies
+        if self.spawn_timer == 0 {
+            let mut rng = thread_rng();
+            let x_pos = rng.gen_range(20_f64, 620_f64);
+            let new_enemy = Enemy::new(20.0, (x_pos, -10.0));
+            self.entities.push(Box::new(new_enemy));
+            self.spawn_timer = rng.gen_range(60, 240);
+        } else {
+            self.spawn_timer -= 1;
+        }
 
         self.entities.retain_mut(|entity| {
             entity.update(args);
@@ -186,6 +197,7 @@ fn main() {
         player: Player::new(),
         entities: Vec::new(),
         fire_key_down: false,
+        spawn_timer: 0,
     };
 
     // core game loop, default ticks/sec = 120
