@@ -20,6 +20,9 @@ const MIN_Y: f64 = 20.0;
 lazy_static! {
     static ref EMPTY: Texture = Texture::empty(&TextureSettings::new()).unwrap();
 }
+lazy_static! {
+    static ref SHOT_TEXTURE: Texture = load_asset("projectile.png");
+}
 
 pub struct Player {
     //    id: usize,
@@ -86,7 +89,7 @@ impl Player {
                 Team::Enemy,
                 10,
                 SIZE / 3.0,
-                load_asset("projectile.png"),
+                &SHOT_TEXTURE,
             )));
             self.shot_delay = FIRE_RATE;
         }
@@ -138,7 +141,7 @@ impl Entity for Player {
         if self.iframes == 0 {
             self.health -= amount;
             self.iframes = IFRAMES;
-            
+
         }
         true
     }

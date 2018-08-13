@@ -13,10 +13,16 @@ const SHOT_DAMAGE: i64 = 10;
 const LOW_BOUND: f64 = -20.0;
 const HIGH_BOUND: f64 = 500.0;
 
+lazy_static! {
+    static ref TEXTURE: Texture = load_asset("enemy.png");
+}
+lazy_static! {
+    static ref SHOT_TEXTURE: Texture = load_asset("enemy_shot.png");
+}
+
 pub struct Enemy {
     //    id: usize,
     pos: (f64, f64),
-    texture: Texture,
     size: f64,
     movement: Movement,
     alive: bool,
@@ -32,7 +38,6 @@ impl Enemy {
         Enemy {
             //            id: rand_id(),
             pos,
-            texture: load_asset("enemy.png"),
             size,
             movement: drift_down,
             alive: true,
@@ -50,7 +55,7 @@ impl Entity for Enemy {
         (self.pos.0, self.pos.1)
     }
     fn texture(&self) -> &Texture {
-        &self.texture
+        &TEXTURE
     }
     fn size(&self) -> f64 {
         self.size
@@ -69,8 +74,7 @@ impl Entity for Enemy {
             let mut shot: Vec<Box<Entity>> = Vec::new();
             let mut shot_movement = Movement::new();
             shot_movement.down = SHOT_SPEED;
-            let texture = load_asset("enemy_shot.png");
-            shot.push(Box::new(Projectile::new(self.pos, shot_movement, Team::Player, SHOT_DAMAGE, 10.0, texture)));
+            shot.push(Box::new(Projectile::new(self.pos, shot_movement, Team::Player, SHOT_DAMAGE, 10.0, &SHOT_TEXTURE)));
             Some(shot)
         } else {
             self.shot_timer -= 1;

@@ -10,7 +10,7 @@ pub struct Projectile {
     //    id: usize,
     pos: (f64, f64),
     targets: Team,
-    texture: Texture,
+    texture: &'static Texture,
     size: f64,
     movement: Movement,
     alive: bool,
@@ -24,7 +24,7 @@ impl Projectile {
         targets: Team,
         damage: i64,
         size: f64,
-        texture: Texture,
+        texture: &'static Texture,
     ) -> Projectile {
         Projectile {
             //            id: rand_id(),
