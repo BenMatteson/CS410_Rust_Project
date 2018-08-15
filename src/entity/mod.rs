@@ -2,11 +2,15 @@ use find_folder;
 use graphics::Transformed;
 use opengl_graphics::{GlGraphics, Texture, TextureSettings};
 use piston::input::RenderArgs;
-use piston::input::*;
+use piston::input::UpdateArgs;
 use piston_window::{rectangle, DrawState, Image};
 //use rand::{thread_rng, Rng};
 
 const BASE_COLLISION_DAMAGE: i64 = 5;
+
+pub mod enemy;
+pub mod player;
+pub mod projectile;
 
 pub trait Entity {
     //    fn id(&self) -> usize;
@@ -57,7 +61,7 @@ pub trait Entity {
 //    rng.gen_range(usize::min_value(), usize::max_value())
 //}
 
-pub fn load_asset(asset: &str) -> Texture {
+pub fn load_texture(asset: &str) -> Texture {
     let assets = find_folder::Search::ParentsThenKids(3, 3)
         .for_folder("assets")
         .unwrap();

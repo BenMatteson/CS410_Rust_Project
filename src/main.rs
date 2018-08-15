@@ -1,4 +1,4 @@
-// Based on code from the Piston tutorials and examples
+// Loosely based on code from the Piston tutorials and examples
 // https://github.com/PistonDevelopers/Piston-Tutorials/tree/master/getting-started
 // https://github.com/PistonDevelopers/piston-examples
 
@@ -17,20 +17,21 @@ extern crate rand;
 extern crate lazy_static;
 
 use odds::vec::VecExt;
-use opengl_graphics::{GlGraphics, OpenGL};
+use opengl_graphics::{GlGraphics, OpenGL, GlyphCache};
 use piston::event_loop::*;
 use piston::input::*;
-use piston_window::{PistonWindow, WindowSettings};
+use piston_window::{PistonWindow, WindowSettings, TextureSettings};
 use rand::{thread_rng, Rng};
 
-mod enemy;
 mod entity;
-mod player;
-mod projectile;
 
 use entity::*;
-use player::Player;
-use enemy::Enemy;
+use entity::player::Player;
+use entity::enemy::Enemy;
+
+//lazy_static! {
+//    static ref FONT: std::path::PathBuf =
+//}
 
 pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
@@ -40,10 +41,12 @@ pub struct App {
 }
 
 impl App {
-    fn render(&mut self, args: &RenderArgs) {
+    fn render(&mut self, args: &RenderArgs, glyphs: &mut GlyphCache) {
         use graphics::*;
 
         const GREEN: [f32; 4] = [0.0, 0.4, 0.25, 1.0];
+        const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
+
         // Clear the screen.
         clear(GREEN, &mut self.gl);
 
@@ -51,6 +54,17 @@ impl App {
             entity.render(&mut self.gl, args);
         }
         self.player.render(&mut self.gl, args);
+
+        let text = format!("Health: {}", self.player.get_health());
+        self.gl.draw(args.viewport(), |c, gl| {
+            text::Text::new_color(WHITE, 20).draw(
+                &text,
+                glyphs,
+                &c.draw_state,
+                c.transform.trans(0.0,20.0),
+                gl
+            ).unwrap();
+        });
 
         // TODO player health, score, other UI?
     }
@@ -82,9 +96,9 @@ impl App {
                 // split the vec to be able to mutate both elements, split after element1 so it keeps index
                 // element2 becomes the first element of the second slice.
                 let (entity1_slice, entity2_slice) = self.entities.split_at_mut(entity2_index);
-                let thing1 = entity1_slice[entity1_index].as_mut();
-                let thing2 = entity2_slice[0].as_mut();
-                collide(thing1, thing2);
+                let entity1 = entity1_slice[entity1_index].as_mut();
+                let entity2 = entity2_slice[0].as_mut();
+                collide(entity1, entity2);
             }
             for entity_index in player_collisions {
                 let entity = self.entities[entity_index].as_mut();
@@ -187,6 +201,9 @@ fn main() {
         .build()
         .unwrap();
 
+    //let font = find_folder::Search::ParentsThenKids(3, 3).for_folder("assets").unwrap().join("FiraSans-Regular.otf");
+    let mut glyphs :GlyphCache = GlyphCache::new("assets/FiraSans-Regular.ttf", (), TextureSettings::new()).unwrap();
+
     // Create a new game and run it.
     let mut app = App {
         gl: GlGraphics::new(opengl),
@@ -199,7 +216,7 @@ fn main() {
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
         if let Some(r) = e.render_args() {
-            app.render(&r);
+            app.render(&r, &mut glyphs);
         }
 
         if let Some(u) = e.update_args() {

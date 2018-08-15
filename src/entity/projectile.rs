@@ -1,6 +1,6 @@
 use entity::*;
 use opengl_graphics::Texture;
-use piston::input::*;
+use piston::input::UpdateArgs;
 
 // bounds for automatically cleaning up stray projectiles
 const LOW_BOUND: f64 = -10.0;

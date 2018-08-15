@@ -1,11 +1,13 @@
 use entity::*;
+use entity::projectile::Projectile;
+
 use opengl_graphics::{Texture, TextureSettings};
 use piston::input::*;
-use projectile::Projectile;
+
 
 const SHOT_SPEED: f64 = 1000.0; // pixels/sec
 const FIRE_RATE: f64 = 0.1; // sec/shot
-const IFRAMES: usize = 30; // 120 ticks/sec
+const IFRAMES: usize = 50; // 120 ticks/sec
 const BASE_HEALTH: i64 = 100;
 
 const SIZE: f64 = 20.0; // pixels (radius?)
@@ -21,7 +23,7 @@ lazy_static! {
     static ref EMPTY: Texture = Texture::empty(&TextureSettings::new()).unwrap();
 }
 lazy_static! {
-    static ref SHOT_TEXTURE: Texture = load_asset("projectile.png");
+    static ref SHOT_TEXTURE: Texture = load_texture("projectile.png");
 }
 
 pub struct Player {
@@ -41,7 +43,7 @@ impl Player {
         Player {
             //            id: rand_id(),
             pos: START,
-            texture: load_asset("ship.png"),
+            texture: load_texture("ship.png"),
             size: SIZE,
             movement: Movement::new(),
             shot_delay: 0.0,
@@ -95,6 +97,10 @@ impl Player {
         }
         volley
     }
+
+    pub fn get_health(&self) -> i64 {
+        self.health
+    }
 }
 
 impl Entity for Player {
@@ -105,8 +111,8 @@ impl Entity for Player {
         (self.pos.0, self.pos.1)
     }
     fn texture(&self) -> &Texture {
-        match self.iframes % 12 {
-            1...6 => &EMPTY,
+        match self.iframes % 16 {
+            8...16 => &EMPTY,
             _ => &self.texture,
         }
     }

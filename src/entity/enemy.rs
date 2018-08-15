@@ -1,8 +1,8 @@
 use entity::*;
-use projectile::Projectile;
+use entity::projectile::Projectile;
 
 use opengl_graphics::Texture;
-use piston::input::*;
+use piston::input::UpdateArgs;
 use rand::{thread_rng, Rng};
 
 const SPEED: f64 = 80.0;
@@ -14,10 +14,10 @@ const LOW_BOUND: f64 = -20.0;
 const HIGH_BOUND: f64 = 500.0;
 
 lazy_static! {
-    static ref TEXTURE: Texture = load_asset("enemy.png");
+    static ref TEXTURE: Texture = load_texture("enemy.png");
 }
 lazy_static! {
-    static ref SHOT_TEXTURE: Texture = load_asset("enemy_shot.png");
+    static ref SHOT_TEXTURE: Texture = load_texture("enemy_shot.png");
 }
 
 pub struct Enemy {
