@@ -75,6 +75,6 @@ impl Entity for Projectile {
         self.alive
     }
     fn team(&self) -> Team {
-        Team::Immune
+        Team::Projectile
     }
 }

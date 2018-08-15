@@ -29,6 +29,10 @@ use entity::*;
 use entity::player::Player;
 use entity::enemy::Enemy;
 
+const TOP_TEXT_HEIGHT: f64 = 20.0;
+const BOTTOM_TEXT_HEIGHT: f64 = 480.0;
+const SCORE_X_POS: f64 = 300.0;
+
 //lazy_static! {
 //    static ref FONT: std::path::PathBuf =
 //}
@@ -38,6 +42,8 @@ pub struct App {
     player: Player,
     entities: Vec<Box<Entity>>,
     spawn_timer: usize,
+    score: i64,
+    high_score: i64,
 }
 
 impl App {
@@ -55,18 +61,32 @@ impl App {
         }
         self.player.render(&mut self.gl, args);
 
-        let text = format!("Health: {}", self.player.get_health());
+        let health = format!("Health: {}", self.player.get_health());
+        let score = format!("Score: {}", self.score);
+        let high_score = format!("High Score: {}", self.high_score);
         self.gl.draw(args.viewport(), |c, gl| {
             text::Text::new_color(WHITE, 20).draw(
-                &text,
+                &health,
                 glyphs,
                 &c.draw_state,
-                c.transform.trans(0.0,20.0),
+                c.transform.trans(0.0, TOP_TEXT_HEIGHT),
+                gl
+            ).unwrap();
+            text::Text::new_color(WHITE, 20).draw(
+                &score,
+                glyphs,
+                &c.draw_state,
+                c.transform.trans(SCORE_X_POS, TOP_TEXT_HEIGHT),
+                gl
+            ).unwrap();
+            text::Text::new_color(WHITE, 20).draw(
+                &high_score,
+                glyphs,
+                &c.draw_state,
+                c.transform.trans(0.0, BOTTOM_TEXT_HEIGHT),
                 gl
             ).unwrap();
         });
-
-        // TODO player health, score, other UI?
     }
 
     fn update(&mut self, args: &UpdateArgs) {
@@ -75,6 +95,11 @@ impl App {
             Some(mut shots) => self.entities.append(&mut shots),
             None => {},
         }
+        if self.player.get_health() == 0 {
+            self.score = 0;
+            self.player.reset();
+        }
+
         { // collisions
             let mut collisions = Vec::new();
             let mut player_collisions = Vec::new();
@@ -116,14 +141,22 @@ impl App {
             self.spawn_timer -= 1;
         }
 
+        let mut score = 0;
         let mut new_entities = Vec::new();
         self.entities.retain_mut(|entity| {
             match entity.update(args) {
                 Some(mut shots) => new_entities.append(&mut shots),
                 None => {},
             }
-            entity.alive()
+            if entity.alive() {
+                true
+            } else {
+                score += entity.score();
+                false
+            }
         });
+        self.score += score;
+        self.high_score = i64::max(self.high_score, self.score);
         self.entities.append(&mut new_entities);
     }
 
@@ -210,6 +243,8 @@ fn main() {
         player: Player::new(),
         entities: Vec::new(),
         spawn_timer: 0,
+        score: 0,
+        high_score: 0,
     };
 
     // core game loop, default ticks/sec = 120

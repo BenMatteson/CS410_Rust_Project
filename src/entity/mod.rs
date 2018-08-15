@@ -34,6 +34,9 @@ pub trait Entity {
         true
     }
     fn team(&self) -> Team;
+    fn score(&self) -> i64 {
+        0
+    }
     fn render(&self, gl: &mut GlGraphics, args: &RenderArgs) {
         let image = Image::new().rect(rectangle::centered(rectangle::square(
             0.0,
@@ -105,5 +108,5 @@ impl Movement {
 pub enum Team {
     Player,
     Enemy,
-    Immune,
+    Projectile,
 }

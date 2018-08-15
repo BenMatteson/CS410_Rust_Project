@@ -28,6 +28,7 @@ pub struct Enemy {
     alive: bool,
     hp: i64,
     shot_timer: usize,
+    score: i64,
 }
 
 impl Enemy {
@@ -43,6 +44,7 @@ impl Enemy {
             alive: true,
             hp,
             shot_timer: rng.gen_range(10, 90), //initial delay
+            score: -50, // player looses points for enemies that escape
         }
     }
 }
@@ -86,6 +88,7 @@ impl Entity for Enemy {
         //println!("enemy damaged, {} -> {}", self.hp, self.hp - amount);
         self.hp -= amount;
         if self.hp <= 0 {
+            self.score = 100;
             self.alive = false;
             //println!("enemy died");
         }
@@ -98,5 +101,9 @@ impl Entity for Enemy {
 
     fn team(&self) -> Team {
         Team::Enemy
+    }
+
+    fn score(&self) -> i64 {
+        self.score
     }
 }

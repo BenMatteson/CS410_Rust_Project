@@ -101,6 +101,14 @@ impl Player {
     pub fn get_health(&self) -> i64 {
         self.health
     }
+
+    pub fn reset(&mut self) {
+        if self.iframes >= 2 * IFRAMES {
+            self.pos = START;
+        } else {
+            self.health = BASE_HEALTH;
+        }
+    }
 }
 
 impl Entity for Player {
@@ -147,7 +155,9 @@ impl Entity for Player {
         if self.iframes == 0 {
             self.health -= amount;
             self.iframes = IFRAMES;
-
+            if self.health <= 0 {
+                self.iframes = 480; // 4 seconds
+            }
         }
         true
     }
