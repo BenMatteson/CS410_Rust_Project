@@ -1,5 +1,5 @@
-use entity::*;
 use entity::projectile::Projectile;
+use entity::*;
 
 use opengl_graphics::Texture;
 use piston::input::UpdateArgs;
@@ -13,6 +13,7 @@ const SHOT_DAMAGE: i64 = 10;
 const LOW_BOUND: f64 = -20.0;
 const HIGH_BOUND: f64 = 500.0;
 
+// staticallly store textures
 lazy_static! {
     static ref TEXTURE: Texture = load_texture("enemy.png");
 }
@@ -20,8 +21,8 @@ lazy_static! {
     static ref SHOT_TEXTURE: Texture = load_texture("enemy_shot.png");
 }
 
+/// An enemy Entity
 pub struct Enemy {
-    //    id: usize,
     pos: (f64, f64),
     size: f64,
     movement: Movement,
@@ -37,22 +38,18 @@ impl Enemy {
         drift_down.down = SPEED;
         let mut rng = thread_rng();
         Enemy {
-            //            id: rand_id(),
             pos,
             size,
             movement: drift_down,
             alive: true,
             hp,
             shot_timer: rng.gen_range(10, 90), //initial delay
-            score: -50, // player looses points for enemies that escape
+            score: -50,                        // player looses points for enemies that escape
         }
     }
 }
 
 impl Entity for Enemy {
-    //    fn id(&self) -> usize {
-    //        self.id
-    //    }
     fn pos(&self) -> (f64, f64) {
         (self.pos.0, self.pos.1)
     }
@@ -76,7 +73,14 @@ impl Entity for Enemy {
             let mut shot: Vec<Box<Entity>> = Vec::new();
             let mut shot_movement = Movement::new();
             shot_movement.down = SHOT_SPEED;
-            shot.push(Box::new(Projectile::new(self.pos, shot_movement, Team::Player, SHOT_DAMAGE, 10.0, &SHOT_TEXTURE)));
+            shot.push(Box::new(Projectile::new(
+                self.pos,
+                shot_movement,
+                Team::Player,
+                SHOT_DAMAGE,
+                10.0,
+                &SHOT_TEXTURE,
+            )));
             Some(shot)
         } else {
             self.shot_timer -= 1;
@@ -84,15 +88,12 @@ impl Entity for Enemy {
         }
     }
 
-    fn damage(&mut self, amount: i64) -> bool {
-        //println!("enemy damaged, {} -> {}", self.hp, self.hp - amount);
+    fn damage(&mut self, amount: i64) {
         self.hp -= amount;
         if self.hp <= 0 {
             self.score = 100;
             self.alive = false;
-            //println!("enemy died");
         }
-        true
     }
 
     fn alive(&self) -> bool {

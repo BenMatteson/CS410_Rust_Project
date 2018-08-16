@@ -4,7 +4,6 @@ use opengl_graphics::{GlGraphics, Texture, TextureSettings};
 use piston::input::RenderArgs;
 use piston::input::UpdateArgs;
 use piston_window::{rectangle, DrawState, Image};
-//use rand::{thread_rng, Rng};
 
 const BASE_COLLISION_DAMAGE: i64 = 5;
 
@@ -13,7 +12,6 @@ pub mod player;
 pub mod projectile;
 
 pub trait Entity {
-    //    fn id(&self) -> usize;
     fn pos(&self) -> (f64, f64);
     fn texture(&self) -> &Texture;
     fn size(&self) -> f64;
@@ -27,16 +25,16 @@ pub trait Entity {
         }
     }
     #[allow(unused_variables)]
-    fn damage(&mut self, amount: i64) -> bool {
-        false
-    }
+    fn damage(&mut self, amount: i64) {}
     fn alive(&self) -> bool {
         true
     }
     fn team(&self) -> Team;
+    /// the effect the entity will have on the score when it dies
     fn score(&self) -> i64 {
         0
     }
+    /// renders the texture returned by texture(), at the size returned by size()
     fn render(&self, gl: &mut GlGraphics, args: &RenderArgs) {
         let image = Image::new().rect(rectangle::centered(rectangle::square(
             0.0,
@@ -52,18 +50,7 @@ pub trait Entity {
     }
 }
 
-//impl PartialEq for Entity {
-//    fn eq(&self, other: &Entity) -> bool {
-//        self.id() == other.id()
-//    }
-//}
-
-// generates random number to be used as id, no checking, not ideal
-//pub fn rand_id() -> usize {
-//    let mut rng = thread_rng();
-//    rng.gen_range(usize::min_value(), usize::max_value())
-//}
-
+/// utility function to load the desired texture from the 'assets' folder
 pub fn load_texture(asset: &str) -> Texture {
     let assets = find_folder::Search::ParentsThenKids(3, 3)
         .for_folder("assets")
@@ -77,6 +64,8 @@ pub fn load_texture(asset: &str) -> Texture {
     Texture::from_path(&file, &settings).unwrap()
 }
 
+/// struct to track movement, allows competing forces to cancel each other out, allowing easier
+/// managing of the player pressing keys for competing directions simultaneously
 pub struct Movement {
     pub up: f64,
     pub down: f64,
@@ -94,6 +83,9 @@ impl Movement {
         }
     }
 
+    /// applies the movement to an entity (or specifically it's position) using the given delta time
+    /// for scale. returns the new position after the movement.
+    // reads well, but a bit unintuitive.
     pub fn applied_to(&self, pos: (f64, f64), delta_time: f64) -> (f64, f64) {
         let (mut x, mut y) = pos;
         let x_movement = (self.right - self.left) * delta_time;
@@ -104,6 +96,8 @@ impl Movement {
     }
 }
 
+/// the various 'teams' entities can have, used to ignore friendly fire, and keep projectiles from colliding
+/// currently also describes the three structs that impl Entity, but this doesn't need to be true
 #[derive(PartialEq, Eq)]
 pub enum Team {
     Player,

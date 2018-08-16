@@ -3,11 +3,12 @@ use opengl_graphics::Texture;
 use piston::input::UpdateArgs;
 
 // bounds for automatically cleaning up stray projectiles
+// fixme if projectiles start moving horizontally, currently would live forever
 const LOW_BOUND: f64 = -10.0;
 const HIGH_BOUND: f64 = 490.0;
 
+/// A projectile Entity
 pub struct Projectile {
-    //    id: usize,
     pos: (f64, f64),
     targets: Team,
     texture: &'static Texture,
@@ -27,7 +28,6 @@ impl Projectile {
         texture: &'static Texture,
     ) -> Projectile {
         Projectile {
-            //            id: rand_id(),
             pos,
             targets,
             texture,
@@ -40,9 +40,6 @@ impl Projectile {
 }
 
 impl Entity for Projectile {
-    //    fn id(&self) -> usize {
-    //        self.id
-    //    }
     fn pos(&self) -> (f64, f64) {
         (self.pos.0, self.pos.1)
     }
@@ -63,12 +60,11 @@ impl Entity for Projectile {
         }
         None
     }
+    // projectiles always die on collision
     fn collide(&mut self, other: &mut Entity) {
         if other.team() == self.targets {
-            if other.damage(self.damage) {
-                self.alive = false;
-
-            }
+            other.damage(self.damage);
+            self.alive = false;
         }
     }
     fn alive(&self) -> bool {

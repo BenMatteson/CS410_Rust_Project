@@ -1,24 +1,25 @@
-use entity::*;
 use entity::projectile::Projectile;
+use entity::*;
 
 use opengl_graphics::{Texture, TextureSettings};
 use piston::input::*;
-
 
 const SHOT_SPEED: f64 = 1000.0; // pixels/sec
 const FIRE_RATE: f64 = 0.1; // sec/shot
 const IFRAMES: usize = 50; // 120 ticks/sec
 const BASE_HEALTH: i64 = 100;
 
-const SIZE: f64 = 20.0; // pixels (radius?)
+const SIZE: f64 = 20.0; // pixels (collision radius)
 const SPEED: f64 = 500.0;
 const START: (f64, f64) = (320.0, 420.0);
 
+// bounds for play area
 const MAX_X: f64 = 620.0;
 const MAX_Y: f64 = 460.0;
 const MIN_X: f64 = 20.0;
 const MIN_Y: f64 = 20.0;
 
+// statically store textures
 lazy_static! {
     static ref EMPTY: Texture = Texture::empty(&TextureSettings::new()).unwrap();
 }
@@ -26,8 +27,8 @@ lazy_static! {
     static ref SHOT_TEXTURE: Texture = load_texture("projectile.png");
 }
 
+/// the Player Entity
 pub struct Player {
-    //    id: usize,
     pos: (f64, f64),
     texture: Texture,
     movement: Movement,
@@ -41,7 +42,6 @@ pub struct Player {
 impl Player {
     pub fn new() -> Player {
         Player {
-            //            id: rand_id(),
             pos: START,
             texture: load_texture("ship.png"),
             size: SIZE,
@@ -75,10 +75,13 @@ impl Player {
         };
     }
 
+    // firing handled as a toggle since it works best given how the key events work
     pub fn set_firing(&mut self, fire: bool) {
         self.fire_key_down = fire;
     }
 
+    // creates a new projectile at current location
+    // wont fire if still waiting on the cooldown, so can be called evey update
     fn fire(&mut self) -> Vec<Box<Entity>> {
         let mut volley: Vec<Box<Entity>> = Vec::new();
         if self.shot_delay <= 0.0 {
@@ -98,6 +101,7 @@ impl Player {
         volley
     }
 
+    // getter for health, used for UI and so the App can manage player 'death'
     pub fn get_health(&self) -> i64 {
         self.health
     }
@@ -112,9 +116,6 @@ impl Player {
 }
 
 impl Entity for Player {
-    //    fn id(&self) -> usize {
-    //        self.id
-    //    }
     fn pos(&self) -> (f64, f64) {
         (self.pos.0, self.pos.1)
     }
@@ -151,7 +152,7 @@ impl Entity for Player {
             false => None,
         }
     }
-    fn damage(&mut self, amount: i64) -> bool {
+    fn damage(&mut self, amount: i64) {
         if self.iframes == 0 {
             self.health -= amount;
             self.iframes = IFRAMES;
@@ -159,7 +160,6 @@ impl Entity for Player {
                 self.iframes = 480; // 4 seconds
             }
         }
-        true
     }
     fn team(&self) -> Team {
         Team::Player
