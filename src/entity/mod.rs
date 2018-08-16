@@ -85,6 +85,7 @@ impl Movement {
 
     /// applies the movement to an entity (or specifically it's position) using the given delta time
     /// for scale. returns the new position after the movement.
+    /// right, and down are positive movements
     // reads well, but a bit unintuitive.
     pub fn applied_to(&self, pos: (f64, f64), delta_time: f64) -> (f64, f64) {
         let (mut x, mut y) = pos;
@@ -94,6 +95,28 @@ impl Movement {
         y += y_movement;
         (x, y)
     }
+}
+
+#[test]
+fn test_applied_to() {
+    let mut vertical = Movement::new();
+    vertical.up = 10.0;
+    let mut horizontal = Movement::new();
+    horizontal.left = 5.0;
+    horizontal.right = 10.0;
+    let mut diagonal = Movement::new();
+    diagonal.right = 10.0;
+    diagonal.down = 10.0;
+    assert_eq!(vertical.applied_to((0.0, 0.0), 1.0), (0.0, -10.0));
+    assert_eq!(vertical.applied_to((0.0, 0.0), 0.5), (0.0, -5.0));
+
+    assert_eq!(horizontal.applied_to((0.0, 0.0), 1.0), (5.0, 0.0));
+    assert_eq!(diagonal.applied_to((0.0, 0.0), 1.0), (10.0, 10.0));
+    assert_eq!(
+        horizontal.applied_to(vertical.applied_to((0.0, 0.0), 1.0), 1.0),
+        (5.0, -10.0)
+    );
+
 }
 
 /// the various 'teams' entities can have, used to ignore friendly fire, and keep projectiles from colliding
